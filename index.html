@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아형이 쾌유 기원 프로젝트 💊</title>
+    <link href="https://fonts.googleapis.com/css2?family=DungGeunMo&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #ffe6eb;
+            --box-color: #ffffff;
+            --text-color: #4a4a4a;
+            --primary-color: #ff80ab;
+            --secondary-color: #ff4081;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'DungGeunMo', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .game-boy {
+            background-color: #fce4ec;
+            width: 340px;
+            padding: 20px;
+            border-radius: 20px 20px 40px 40px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1), inset 0 -10px 0 rgba(0,0,0,0.05);
+            border: 4px solid #fff;
+        }
+
+        .screen-container {
+            background-color: #7c7c7c;
+            padding: 15px 15px 5px 15px;
+            border-radius: 10px 10px 30px 10px;
+            margin-bottom: 20px;
+        }
+
+        .screen {
+            background-color: #e0f7fa;
+            height: 250px;
+            border: 2px solid #5a5a5a;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 캐릭터 스타일 */
+        .character-zone {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .char {
+            font-size: 50px;
+            transition: transform 0.3s;
+            cursor: pointer;
+            filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.1));
+        }
+
+        .ahyeong-char {
+            position: relative;
+        }
+
+        .cold-germ {
+            position: absolute;
+            font-size: 20px;
+            top: -10px;
+            right: -10px;
+            animation: float 2s infinite;
+        }
+
+        /* 상태바 */
+        .status-bar {
+            width: 80%;
+            height: 15px;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 2px solid #4a4a4a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hp-fill {
+            width: 20%;
+            height: 100%;
+            background-color: #ff4081;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .hp-text {
+            font-size: 12px;
+            margin-top: 5px;
+            color: #555;
+        }
+
+        /* 컨트롤 패널 */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: #fff;
+            border: 3px solid #ff80ab;
+            border-radius: 15px;
+            padding: 12px;
+            font-family: 'DungGeunMo', sans-serif;
+            font-size: 14px;
+            color: #d81b60;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 4px 0 #f06292;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #f06292;
+        }
+
+        .btn:disabled {
+            background-color: #eee;
+            border-color: #aaa;
+            color: #aaa;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* 대화창 */
+        .dialog {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #4a4a4a;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 13px;
+            line-height: 1.4;
+            position: absolute;
+            bottom: 10px;
+            width: 85%;
+            display: none;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+        }
+
+        /* 금지 표지판 */
+        .ban-sign {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            color: rgba(255, 0, 0, 0.8);
+            z-index: 10;
+            pointer-events: none;
+            display: block;
+            text-shadow: 2px 2px 0 #fff;
+        }
+
+        /* 애니메이션 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes happyJump {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* 파티클 */
+        .heart {
+            position: absolute;
+            color: #ff4081;
+            animation: float 1s ease-out;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-boy">
+        <div style="text-align: center; margin-bottom: 10px; color: #d81b60;">♥ 아형이 쾌유 작전 ♥</div>
+        <div class="screen-container">
+            <div class="screen" id="screen">
+                <div class="ban-sign" id="banSign">🚫</div>
+                
+                <div class="character-zone">
+                    <div class="char" id="jaeyoung">🥺</div>
+                    <div class="char ahyeong-char" id="ahyeong">
+                        😷
+                        <div class="cold-germ" id="germ">🦠</div>
+                    </div>
+                </div>
+
+                <div class="status-bar">
+                    <div class="hp-fill" id="loveGuage"></div>
+                </div>
+                <div class="hp-text" id="statusText">아형이 컨디션: 매우 나쁨 (뽀뽀 불가 🙅‍♀️)</div>
+
+                <div class="dialog" id="dialogBox"></div>
+            </div>
+        </div>
+
+        <div class="controls" id="controlPanel">
+            <button class="btn" onclick="giveItem('peach')">🍑 피치맛 약 주기</button>
+            <button class="btn" onclick="giveItem('blanket')">🛌 따뜻한 이불 덮기</button>
+            <button class="btn" onclick="giveItem('eyes')">👀 꿀 떨어지는 눈빛</button>
+            <button class="btn" onclick="tryKiss()" id="kissBtn" style="background-color: #ffebee;">💋 뽀뽀 시도</button>
+        </div>
+    </div>
+
+    <script>
+        let loveScore = 20;
+        let isCured = false;
+        const screen = document.getElementById('screen');
+        const jaeyoung = document.getElementById('jaeyoung');
+        const ahyeong = document.getElementById('ahyeong');
+        const germ = document.getElementById('germ');
+        const loveGuage = document.getElementById('loveGuage');
+        const statusText = document.getElementById('statusText');
+        const dialogBox = document.getElementById('dialogBox');
+        const banSign = document.getElementById('banSign');
+        const kissBtn = document.getElementById('kissBtn');
+
+        // 초기 상태 설정
+        updateStatus();
+
+        function showDialog(text, duration = 2000) {
+            dialogBox.innerHTML = text;
+            dialogBox.style.display = 'block';
+            setTimeout(() => {
+                dialogBox.style.display = 'none';
+            }, duration);
+        }
+
+        function giveItem(item) {
+            if (isCured) {
+                showDialog("아형: 이미 다 나았어! 얼른 뽀뽀해죠 ❤️");
+                return;
+            }
+
+            let msg = "";
+            let scoreAdd = 0;
+
+            if (item === 'peach') {
+                msg = "재영: (달달한 피치맛 약을 건넨다)<br>아형: 오! 복숭아 맛이다 냠냠 🍑";
+                scoreAdd = 30;
+                createEffect('🍑');
+            } else if (item === 'blanket') {
+                msg = "재영: (꼬옥) 따뜻하게 덮고 자자<br>아형: 히히 따뜻해서 노곤노곤해..☁️";
+                scoreAdd = 25;
+                createEffect('☁️');
+            } else if (item === 'eyes') {
+                msg = "재영: (지긋이 바라보며) 얼른 나아..<br>아형: 으앙 그렇게 쳐다보면 부끄러..🙈";
+                scoreAdd = 20;
+                createEffect('✨');
+            }
+
+            loveScore += scoreAdd;
+            if (loveScore > 100) loveScore = 100;
+            
+            showDialog(msg);
+            updateStatus();
+            
+            // 캐릭터 애니메이션
+            ahyeong.style.animation = "happyJump 0.5s";
+            setTimeout(() => ahyeong.style.animation = "", 500);
+        }
+
+        function tryKiss() {
+            if (!isCured) {
+                // 거절 모드
+                jaeyoung.innerText = "😱";
+                ahyeong.innerText = "🙅‍♀️";
+                banSign.style.animation = "float 0.2s infinite";
+                setTimeout(() => banSign.style.animation = "", 200);
+                
+                showDialog("아형: 안대!! 감기 옮는단 말야! ✋<br>재영: (충격) 힝..");
+                
+                setTimeout(() => {
+                    jaeyoung.innerText = "🥺";
+                    ahyeong.innerText = "😷";
+                }, 1500);
+            } else {
+                // 성공 모드 (엔딩)
+                endingScene();
+            }
+        }
+
+        function updateStatus() {
+            loveGuage.style.width = loveScore + "%";
+            
+            if (loveScore < 50) {
+                statusText.innerText = "상태: 감기 기운 가득 (뽀뽀 절대 금지)";
+            } else if (loveScore < 100) {
+                statusText.innerText = "상태: 사랑으로 치유 중... (조금만 더!)";
+                jaeyoung.innerText = "🙂";
+                ahyeong.innerText = "🤒";
+            } else {
+                gameClear();
+            }
+        }
+
+        function gameClear() {
+            isCured = true;
+            statusText.innerText = "상태: 완치! 뽀뽀 금지령 해제 🎉";
+            statusText.style.color = "#d81b60";
+            statusText.style.fontWeight = "bold";
+            
+            germ.style.display = "none";
+            ahyeong.innerText = "🥰";
+            jaeyoung.innerText = "😍";
+            
+            // 금지 표지판 깨짐 효과 (투명도 조절로 대체)
+            banSign.style.opacity = "0";
+            banSign.style.transition = "opacity 1s";
+            
+            kissBtn.innerText = "❤️ 뽀뽀 100만번 하기 ❤️";
+            kissBtn.style.backgroundColor = "#ff4081";
+            kissBtn.style.color = "white";
+            kissBtn.style.border = "3px solid #c51162";
+            
+            showDialog("SYSTEM: 아형 님이 재영 님의 사랑으로<br>완치되었습니다! 보상이 잠금 해제됨 🔓", 3000);
+        }
+
+        function endingScene() {
+            screen.style.backgroundColor = "#ffc1e3";
+            jaeyoung.innerText = "😽";
+            ahyeong.innerText = "😻";
+            
+            // 하트 폭죽
+            setInterval(() => createEffect('❤️'), 100);
+            setInterval(() => createEffect('💋'), 150);
+
+            dialogBox.style.display = 'block';
+            dialogBox.innerHTML = `
+                <span style="color:#d81b60; font-weight:bold;">Mission Complete!</span><br>
+                여보 아프지 마 ㅠㅠ 이제 금지령 끝났으니까<br>
+                못했던 뽀뽀 100번 다 할거야 각오해!<br>
+                사랑해 내 1호 팬 아형이 ❤️
+            `;
+            
+            // 버튼 숨기기
+            document.getElementById('controlPanel').style.display = 'none';
+        }
+
+        function createEffect(emoji) {
+            const el = document.createElement('div');
+            el.className = 'heart';
+            el.innerText = emoji;
+            el.style.left = Math.random() * 80 + 10 + "%";
+            el.style.top = Math.random() * 80 + 10 + "%";
+            el.style.fontSize = (Math.random() * 20 + 10) + "px";
+            screen.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+    </script>
+</body>
+</html>
