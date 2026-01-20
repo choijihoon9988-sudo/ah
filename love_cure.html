@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>긴급! 볼 뽀뽀 금지령</title>
+    <link href="https://fonts.googleapis.com/css2?family=DungGeunMo&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fce4ec; /* 사랑스러운 핑크 배경 */
+            font-family: 'DungGeunMo', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .game-container {
+            background-color: #fff;
+            width: 350px;
+            padding: 20px;
+            border: 4px solid #4a4a4a;
+            border-radius: 10px;
+            box-shadow: 10px 10px 0px #ff80ab;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            color: #d81b60;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px #ffc1e3;
+        }
+
+        .screen {
+            background-color: #e3f2fd;
+            border: 3px solid #4a4a4a;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 캐릭터 및 아이콘 */
+        .character {
+            font-size: 60px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .ahyeong-zone {
+            position: absolute;
+            right: 40px;
+            animation: float 2s infinite ease-in-out;
+        }
+
+        .jaeyoung-zone {
+            position: absolute;
+            left: 40px;
+        }
+
+        /* 상태 아이콘 */
+        .status-icon {
+            position: absolute;
+            font-size: 30px;
+            top: -10px;
+            right: -10px;
+            opacity: 0;
+        }
+
+        .mask { opacity: 1; }
+        .ban-sign { 
+            position: absolute;
+            font-size: 80px;
+            color: red;
+            opacity: 0;
+            z-index: 10;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        /* 대화창 */
+        .dialog-box {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            min-height: 60px;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: left;
+            margin-bottom: 15px;
+            border: 2px solid #000;
+        }
+
+        .btn {
+            background-color: #ff4081;
+            color: white;
+            border: none;
+            border-bottom: 4px solid #c60055;
+            padding: 10px 20px;
+            font-family: 'DungGeunMo', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.1s;
+        }
+
+        .btn:active {
+            border-bottom: 0px;
+            transform: translateY(4px);
+        }
+
+        /* 애니메이션 정의 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        @keyframes heartDrop {
+            0% { top: -50px; opacity: 1; transform: rotate(0deg); }
+            100% { top: 100%; opacity: 0; transform: rotate(360deg); }
+        }
+
+        /* 파티클 효과 */
+        .particle {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>🚨 비상! 뽀뽀 금지 🚨</h1>
+        
+        <div class="screen" id="gameScreen">
+            <div class="jaeyoung-zone">
+                <div class="character" id="jaeyoung">🥹</div>
+            </div>
+
+            <div class="ban-sign" id="banSign">❌</div>
+
+            <div class="ahyeong-zone">
+                <div class="character" id="ahyeong">👸</div>
+                <div class="status-icon mask">😷</div>
+            </div>
+        </div>
+
+        <div class="dialog-box" id="dialog">
+            재영: (쭈굴) 뽀..뽀뽀 한번만...<br>
+            아형: 안돼! 나 감기 옮는단 말야! 🙅‍♀️
+        </div>
+
+        <button class="btn" id="actionBtn" onclick="tryKiss()">뽀뽀 시도하기</button>
+    </div>
+
+    <script>
+        const jaeyoung = document.getElementById('jaeyoung');
+        const ahyeong = document.getElementById('ahyeong');
+        const banSign = document.getElementById('banSign');
+        const dialog = document.getElementById('dialog');
+        const btn = document.getElementById('actionBtn');
+        const screen = document.getElementById('gameScreen');
+
+        let step = 0;
+
+        function tryKiss() {
+            if (step === 0) {
+                // 1단계: 뽀뽀 시도 -> 거절 및 충격
+                jaeyoung.style.transform = "translateX(80px)"; // 다가감
+                
+                setTimeout(() => {
+                    banSign.style.opacity = "1";
+                    banSign.style.animation = "shake 0.5s";
+                    jaeyoung.innerText = "😱"; // 충격받은 표정
+                    jaeyoung.style.animation = "shake 0.5s infinite";
+                    dialog.innerHTML = "SYSTEM: <span style='color:#ff4081'>[볼 뽀뽀 금지령]</span>이 발동되었습니다!<br>재영 님이 충격을 받았습니다.";
+                    btn.innerText = "얼른 낫게 해주기 (치료)";
+                    step = 1;
+                }, 600);
+            } else if (step === 1) {
+                // 2단계: 치료 시작
+                jaeyoung.style.animation = "none";
+                jaeyoung.style.transform = "translateX(0)";
+                banSign.style.opacity = "0";
+                
+                healAnimation();
+                
+                jaeyoung.innerText = "💊";
+                ahyeong.innerText = "🥰";
+                
+                dialog.innerHTML = "재영: 아프지 마... 내 사랑과 비타민을 받아라!<br>아형: (감동 중...)";
+                btn.innerText = "최종 메시지 확인";
+                step = 2;
+            } else if (step === 2) {
+                // 3단계: 엔딩
+                screen.style.backgroundColor = "#ffc1e3";
+                jaeyoung.innerText = "😍";
+                ahyeong.innerText = "💖";
+                document.querySelector('.mask').innerText = "✨"; // 마스크가 반짝임으로 변경
+                
+                dialog.innerHTML = "아형아, 얼른 나아서 뽀뽀 백만 번 하자.<br>아프지 말고 푹 쉬어 사랑해! 💕";
+                btn.innerText = "다시 하기";
+                btn.onclick = () => location.reload();
+                createHearts();
+            }
+        }
+
+        function healAnimation() {
+            // 약과 하트가 떨어지는 효과
+            for(let i=0; i<20; i++) {
+                let p = document.createElement('div');
+                p.className = 'particle';
+                p.innerText = Math.random() > 0.5 ? '💊' : '❤️';
+                p.style.left = Math.random() * 300 + 'px';
+                p.style.animation = `heartDrop ${Math.random() * 1 + 1}s linear`;
+                screen.appendChild(p);
+                
+                setTimeout(() => p.remove(), 2000);
+            }
+        }
+
+        function createHearts() {
+             setInterval(() => {
+                let p = document.createElement('div');
+                p.className = 'particle';
+                p.innerText = '💖';
+                p.style.left = Math.random() * 300 + 'px';
+                p.style.animation = `heartDrop ${Math.random() * 2 + 1}s linear`;
+                screen.appendChild(p);
+                setTimeout(() => p.remove(), 3000);
+             }, 300);
+        }
+    </script>
+</body>
+</html>
